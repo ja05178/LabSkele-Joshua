@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" 
+    android:layout_height="match_parent"
+    android:padding="3dp">
+
+    <TextView
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:tooltipText="Hi I'm the Information Technology Building"
+        android:id="@+id/bldgName"
+        android:textColor="#000000"
+        style="@style/Base.TextAppearance.AppCompat.Small"
+        android:text="Building Name"
+        android:layout_marginTop="15dp"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+
+    <TextView
+        android:textAllCaps="false"
+        android:layout_marginTop="15dp"
+        android:tooltipText="Address"
+        android:layout_marginLeft="25dp"
+        style="@style/Base.TextAppearance.AppCompat.Small"
+        android:text="Address"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/bldgAddress"
+        android:layout_below="@+id/bldgName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:textAllCaps="false"
+        android:layout_marginTop="15dp"
+        android:tooltipText="phone number"
+        android:layout_marginLeft="15dp"
+        style="@style/Base.TextAppearance.AppCompat.Small"
+        android:text="Phone Number"
+        android:id="@+id/bldgPhNo"
+        android:layout_below="@+id/bldgAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        style="@style/Base.TextAppearance.AppCompat.Small"
+        android:textAllCaps="false"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:layout_below="@id/bldgPhNo"
+        android:id="@+id/noOfLabs"
+        android:text="# of Labs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        style="@style/Base.TextAppearance.AppCompat.Small"
+        android:textAllCaps="false"
+        android:layout_marginRight="15dp"
+        android:layout_alignParentRight="true"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="60dp"
+        android:layout_below="@id/bldgName"
+        android:id="@+id/availableLabel"
+        android:text="Available?"
+        android:tooltipText="Is there an available lab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:tooltipText="Green = Yes \n Red = No"
+        android:id="@+id/available"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="40dp"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/availableLabel"
+        android:background="#ac4"
+        android:layout_width="25dp"
+        android:layout_height="25dp" />
+
+    <Button
+        style="@style/Base.TextAppearance.AppCompat.Small"
+        android:textAllCaps="false"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_below="@id/noOfLabs"
+        android:text="view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
