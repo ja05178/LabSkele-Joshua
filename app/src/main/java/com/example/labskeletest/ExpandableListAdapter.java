@@ -10,6 +10,9 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -137,21 +140,10 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 }
             }
         });
-        int inUse = child.getInUseComputers();
-        int total = child.getTotalComputers();
-        int totalPreset = child.getPresetTotalComputers();
-        int difference = totalPreset - total;
-        inUse = inUse + difference;
-        double percentInUse = (double) inUse /totalPreset;
-        if(percentInUse > .75){
-            view.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
-        }
-        else if(percentInUse > .50){
-            view.setBackgroundColor(context.getResources().getColor(R.color.colorYellow));
-        }
-        else{
-            view.setBackgroundColor(context.getResources().getColor(R.color.colorGreen));
-        }
+        setColor(child, percentLabel);
+
+        Calendar currentTime = Calendar.getInstance();
+        child.checkClassInSession(currentTime);
         return view;
     }
     public void setLabClicked(String lab, Lab object){
@@ -163,5 +155,28 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
+    }
+    public void setColor(Lab child, TextView percentLabel){
+        int inUse = child.getInUseComputers();
+        int total = child.getTotalComputers();
+        int totalPreset = child.getPresetTotalComputers();
+        int difference = totalPreset - total;
+        inUse = inUse + difference;
+        double percentInUse = (double) inUse /totalPreset;
+
+
+        if(percentInUse > .75){
+            //view.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
+            percentLabel.setTextColor(context.getResources().getColor(R.color.colorRed));
+
+        }
+        else if(percentInUse > .50){
+            //view.setBackgroundColor(context.getResources().getColor(R.color.colorYellow));
+            percentLabel.setTextColor(context.getResources().getColor(R.color.colorYellow));
+        }
+        else{
+            //view.setBackgroundColor(context.getResources().getColor(R.color.colorGreen));
+            percentLabel.setTextColor(context.getResources().getColor(R.color.colorGreen));
+        }
     }
 }

@@ -69,6 +69,21 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
         }
         return rs;
     }
+    public ResultSet getClassTimes(String lab){
+        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
+
+        String query = "Use lablocator; select * from classes where location like '%" + lab + "%' order by location ASC;";
+        System.out.println(query);
+        try{
+
+            Log.i("Conn status", String.valueOf(conn.isClosed()));
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
+    }
 
     public ResultSet getOccupancy(String lab){
         conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());

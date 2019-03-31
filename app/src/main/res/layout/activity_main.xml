@@ -20,6 +20,8 @@
         android:layout_marginBottom="89dp"
         app:tabBackground="@drawable/tab_selector"
         app:tabGravity="center"
-        app:tabIndicatorHeight="0dp"></android.support.design.widget.TabLayout>
+        app:tabIndicatorHeight="0dp"
+        android:background="@color/colorGeorgiaSouthernGold"
+        ></android.support.design.widget.TabLayout>
 
 </RelativeLayout>

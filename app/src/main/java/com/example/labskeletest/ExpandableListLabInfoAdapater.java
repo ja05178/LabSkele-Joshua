@@ -1,27 +1,41 @@
 package com.example.labskeletest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
+import android.support.constraint.ConstraintLayout;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ExpandableListView;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
     private Context context;
     private java.util.List<String> listDataHeader;
     private HashMap<String,java.util.List<String>> listHashMap;
     private Lab lab;
+    DBConfiguration dbc = new DBConfiguration();
+    DBAccess db = new DBAccess();
 
     public ExpandableListLabInfoAdapater(Context content, java.util.List<String> listDataHeader, HashMap<String, List<String>> listHashMap, Lab lab) {
         this.context = content;
         this.listDataHeader = listDataHeader;
         this.listHashMap = listHashMap;
         this.lab = lab;
+
     }
 
     @Override
@@ -63,7 +77,7 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
     public View getGroupView(int groupPosition, boolean isExpanded, View view, ViewGroup parent) {
         String headerTitle = (String) getGroup(groupPosition);
         if(view == null){
-            LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.listview_textview, null);
         }
 
@@ -71,137 +85,196 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
 
         listLabel.setTypeface(null , Typeface.BOLD);
         listLabel.setText(headerTitle);
+
         if(groupPosition == 0){
             view = setUpLabName(view);
-            return view;
         }
         else if (groupPosition ==1){
             view = setUpOccupancy(view);
-            return view;
         }
         else if (groupPosition ==2){
             view = setUpPrinter(view);
-            return view;
         }
         else if (groupPosition ==3){
             view = setUpLabHours(view);
-            return view;
         }
-        else{
+        else if (groupPosition ==4){
             view = setUpSoftware(view);
-            return view;
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    labSoftwareClicked(v);
+                }
+            });
         }
+        return view;
+
     }
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View view, ViewGroup parent) {
         final String childText = (String) getChild(groupPosition, childPosition);
-        if(view == null){
-            LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.listitem, null);
-        }
-        final TextView childLabel = (TextView) view.findViewById(R.id.tvLabNumber);
-        childLabel.setText(childText);
-        return view;
-
-//        System.out.println("Child Text" + childText);
+//        if(view == null){
+//            LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(LAYOUT_INFLATER_SERVICE);
+//            view = inflater.inflate(R.layout.listitem, null);
+//        }
+//        final TextView childLabel = (TextView) view.findViewById(R.id.tvLabNumber);
+//        childLabel.setText(childText);
+        System.out.println("group position" + groupPosition);
+        System.out.println("childPosition  position" + childPosition);
 //        if(view == null) {
-//            if (groupPosition == 0) {
-//                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(R.layout.listitem_header, null);
-//                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabHeader);
-//                childLabel.setText(childText);
-//
-//                return view;
-//            } else if (groupPosition == 1) {
-//                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(R.layout.listitem, null);
+            if (groupPosition == 0) {
+                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.listitem_header, null);
+                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabHeader);
+                childLabel.setText(childText);
+            } else if (groupPosition == 1) {
+                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.listitem_occupancy, null);
+                setUpOccupancyChild(childPosition, groupPosition, view);
 //                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabNumber);
 //                childLabel.setText(childText);
-//                return view;
-//            } else if (groupPosition == 2) {
-//                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(R.layout.listitem_printer, null);
-//                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabPrinter);
-//                childLabel.setText(childText);
-//                return view;
-//            } else if (groupPosition == 3) {
-//                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(R.layout.listitem_hours, null);
-//                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabHours);
-//                childLabel.setText(childText);
-//                return view;
-//            } else {
-//                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                view = inflater.inflate(R.layout.listitem_software, null);
-//                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabSoftware);
-//                childLabel.setText(childText);
-//                return view;
-//            }
+            } else if (groupPosition == 2) {
+                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.listitem_printer, null);
+                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabPrinter);
+                childLabel.setText(childText);
+            } else if (groupPosition == 3) {
+                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.listitem_hours, null);
+                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabHours);
+                childLabel.setText(childText);
+            } else {
+                LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.listitem_software, null);
+                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabSoftware);
+                childLabel.setText(childText);
+            }
 //        }
-//        else{
-//            return view;
- //       }
+        view.setBackgroundColor(context.getResources().getColor(R.color.colorTestGrey));
+       return view;
     }
+
+    private void setUpOccupancyChild(int childPosition, int groupPosition, View view) {
+        final TextView roomLabel = (TextView) view.findViewById(R.id.tvLabNumber2);
+        roomLabel.setText(lab.getRoom().substring(lab.getRoom().length() - 4));
+
+        TextView percentLabel = (TextView) view.findViewById(R.id.tvLabPercent2);
+        percentLabel.setText(lab.getPercentage());
+
+        final ToggleButton favoriteBtn = (ToggleButton) view.findViewById(R.id.toggleButton2);
+        final boolean isFavorite = MainActivity.listOfFavorites.contains(lab.getRoom());
+        if(isFavorite){
+            favoriteBtn.setBackgroundResource(R.drawable.btn_favorite);
+            favoriteBtn.setChecked(true);
+        }else{
+            favoriteBtn.setBackgroundResource(R.drawable.btn_unfavorite);
+            favoriteBtn.setChecked(false);
+        }
+        favoriteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                System.out.println("Favorite has been clicked. Lab room:" + lab.getRoom());
+
+                System.out.println("Child.getRoom ----" + lab.getRoom());
+                if(favoriteBtn.isChecked()) {
+                    favoriteBtn.setBackgroundResource(R.drawable.btn_favorite);
+                    String UUID = MainActivity.uniqueID;
+                    String room = lab.getRoom();
+                    db = new DBAccess();
+                    db.saveFavorite(UUID, room);
+                }
+                else{
+                    favoriteBtn.setBackgroundResource(R.drawable.btn_unfavorite);
+                    String UUID = MainActivity.uniqueID;
+                    String room = lab.getRoom();
+                    db = new DBAccess();
+                    db.deleteFavorite(UUID, room);
+
+                    for(int i = 0; i < MainActivity.listOfFavorites.size(); i++){
+                        if(MainActivity.listOfFavorites.get(i).contains(lab.getRoom())){
+                            MainActivity.listOfFavorites.remove(i);
+                        }
+                    }
+                }
+            }
+        });
+        setColor(lab, percentLabel);
+
+        Calendar currentTime = Calendar.getInstance();
+        lab.checkClassInSession(currentTime);
+    }
+
     @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
         return true;
     }
-
     private View setUpLabName(View view){
         view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
         return view;
     }
-    private View setUpOccupancy(View view){
-
-        int inUse = lab.getInUseComputers();
-        int total = lab.getTotalComputers();
-        int totalPreset = lab.getPresetTotalComputers();
+    public void setColor(Lab child, TextView percentLabel){
+        int inUse = child.getInUseComputers();
+        int total = child.getTotalComputers();
+        int totalPreset = child.getPresetTotalComputers();
         int difference = totalPreset - total;
         inUse = inUse + difference;
         double percentInUse = (double) inUse /totalPreset;
+
+
         if(percentInUse > .75){
-            view.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
+            //view.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
+            percentLabel.setTextColor(context.getResources().getColor(R.color.colorRed));
+
         }
         else if(percentInUse > .50){
-            view.setBackgroundColor(context.getResources().getColor(R.color.colorYellow));
+            //view.setBackgroundColor(context.getResources().getColor(R.color.colorYellow));
+            percentLabel.setTextColor(context.getResources().getColor(R.color.colorYellow));
         }
         else{
-            view.setBackgroundColor(context.getResources().getColor(R.color.colorGreen));
+            //view.setBackgroundColor(context.getResources().getColor(R.color.colorGreen));
+            percentLabel.setTextColor(context.getResources().getColor(R.color.colorGreen));
         }
+    }
+    private View setUpOccupancy(View view){
+
+//        int inUse = lab.getInUseComputers();
+//        int total = lab.getTotalComputers();
+//        int totalPreset = lab.getPresetTotalComputers();
+//        int difference = totalPreset - total;
+//        inUse = inUse + difference;
+//        double percentInUse = (double) inUse /totalPreset;
+//        if(percentInUse > .75){
+//            view.setBackgroundColor(context.getResources().getColor(R.color.colorRed));
+//        }
+//        else if(percentInUse > .50){
+//            view.setBackgroundColor(context.getResources().getColor(R.color.colorYellow));
+//        }
+//        else{
+//            view.setBackgroundColor(context.getResources().getColor(R.color.colorGreen));
+//        }
+
+        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
         return view;
     }
     private View setUpPrinter(View view){
-        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGrey));
+        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
         return view;
     }
     private View setUpLabHours(View view){
-        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGrey));
+        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
         return view;
     }
     private View setUpSoftware(View view){
-        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGrey));
+        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
         return view;
     }
-//    private View setUpLabNameChild(View view){
-//        return view;
-//    }
-//
-//    private View setUpOccupancyChild(View view){
-//        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGrey));
-//        return view;
-//    }
-//    private View setUpPrinterChild(View view){
-//        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGrey));
-//        return view;
-//    }
-//    private View setUpLabHoursChild(View view){
-//        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGrey));
-//        return view;
-//    }
-//    private View setUpSoftwareChild(View view){
-//        return view;
-//    }
-//
+    private void labSoftwareClicked(View view){
+        System.out.println("Software CLicked");
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
 
+        View softwarePopup = inflater.inflate(R.layout.software_popup,null);
+        PopupWindow mPopupWindow = new PopupWindow(softwarePopup, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        mPopupWindow.showAtLocation(view, Gravity.CENTER,0,0);
+    }
 }
