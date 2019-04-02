@@ -11,22 +11,22 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 public class Lab implements Serializable {
 
     private String room;
     private String schedule;
-    ArrayList <String> softwareList = new <String> ArrayList();
-    ArrayList <String> classStart = new <String> ArrayList();
-    ArrayList <String> classEnd = new <String> ArrayList();
-    ArrayList <String> classDay = new <String> ArrayList();
+    ArrayList<String> softwareList = new <String>ArrayList();
+    ArrayList<String> classStart = new <String>ArrayList();
+    ArrayList<String> classEnd = new <String>ArrayList();
+    ArrayList<String> classDay = new <String>ArrayList();
     private int inUseComputers;
     private int totalComputers;
     private int presetTotalComputers;
 
 
-
-    Lab(String labRoom){
+    Lab(String labRoom) {
         room = labRoom;
 
         try {
@@ -69,17 +69,24 @@ public class Lab implements Serializable {
             String class_start = occupancy.getString("start_time");
             String class_end = occupancy.getString("end_time");
             String class_day = occupancy.getString("days");
-//            if(class_start.contains("p")){
-//                class_start
-//            }
+
+            class_start = formatTime(class_start);
+            class_end = formatTime(class_end);
+
             classStart.add(class_start);
             classEnd.add(class_end);
             classDay.add(class_day);
-
         }
 
 
+    }
 
+    public String formatTime(String correctFormat) {
+        if (!(correctFormat.length() == 6)) {
+            String addZero = "0";
+            correctFormat = addZero + correctFormat;
+        }
+        return correctFormat;
     }
 
     public String getRoom() {
@@ -90,18 +97,22 @@ public class Lab implements Serializable {
         return softwareList;
     }
 
-    public ArrayList<String> getClassStart() { return classStart; }
+    public ArrayList<String> getClassStart() {
+        return classStart;
+    }
+
     public ArrayList<String> getClassEnd() {
         return classEnd;
     }
+
     public ArrayList<String> getClassDay() {
         return classDay;
     }
 
-    public boolean checkClassInSession(Calendar currentTime){
+    public boolean checkClassInSession(Calendar currentTime) {
 
         int day = currentTime.get(Calendar.DAY_OF_WEEK);
-        String day_of_week="";
+        String day_of_week = "";
         switch (day) {
             case Calendar.SUNDAY:
                 day_of_week = "S";
@@ -124,50 +135,83 @@ public class Lab implements Serializable {
                 day_of_week = "S";
                 break;
         }
-        System.out.println(day_of_week + "DAY OF WEEK");
-        for(int i = 0; i < classEnd.size(); i ++){
-//            try {
-//
-//                Date startTime = new SimpleDateFormat("HH:mm:ss").parse(classStart.get(i) +);
-//                Calendar calendar1 = Calendar.getInstance();
-//                calendar1.setTime(time1);
-//
-//                String string2 = "14:49:00";
-//                Date time2 = new SimpleDateFormat("HH:mm:ss").parse(string2);
-//                Calendar calendar2 = Calendar.getInstance();
-//                calendar2.setTime(time2);
-//                calendar2.add(Calendar.DATE, 1);
-//
-//                String someRandomTime = "01:00:00";
-//                Date d = new SimpleDateFormat("HH:mm:ss").parse(someRandomTime);
-//                Calendar calendar3 = Calendar.getInstance();
-//                calendar3.setTime(d);
-//                calendar3.add(Calendar.DATE, 1);
-//
-//                Date x = calendar3.getTime();
-//                if (x.after(calendar1.getTime()) && x.before(calendar2.getTime())) {
-//                    //checkes whether the current time is between 14:49:00 and 20:11:13.
-//                    System.out.println(true);
-//                }
-//            } catch (ParseException e) {
-//                e.printStackTrace();
-//            }
-            System.out.println("class End----: " +classEnd.get(i).toString());
+//        System.out.println(day_of_week + "DAY OF WEEK");
+        for (int i = 0; i < classEnd.size(); i++) {
+            System.out.println("Day of Week of Class: " + classDay.get(i).toString());
+            System.out.println("Current Day: " + day_of_week);
+            if (classDay.get(i).contains(day_of_week)) {
+                try {
+                    System.out.println("Same day, checking times");
+                    String trimmedStart = classStart.get(i).substring(0, classStart.get(i).length() - 1);
+                    String ampmStart = classStart.get(i).substring(classStart.get(i).length() - 1, classStart.get(i).length());
+
+                    String trimmedEnd = classEnd.get(i).substring(0, classEnd.get(i).length() - 1);
+                    String ampmEnd = classEnd.get(i).substring(classEnd.get(i).length() - 1, classEnd.get(i).length());
+
+                    if (ampmStart.equals("p")) {
+//                    System.out.println("Before + 12 " + trimmedStart);
+                        String firstTwo = trimmedStart.substring(0, 2);
+                        int firstTwoNum = Integer.parseInt(firstTwo);
+                        if (firstTwoNum != 12) {
+                            firstTwoNum = firstTwoNum + 12;
+                            String parsed = String.valueOf(firstTwoNum);
+                            trimmedStart = parsed + trimmedStart.substring(2);
+//                        System.out.println("After + 12 " + trimmedStart);
+                        }
+                    }
+                    if (ampmEnd.equals("p")) {
+//                    System.out.println("Before + 12 " + trimmedEnd);
+                        String firstTwo = trimmedEnd.substring(0, 2);
+                        int firstTwoNum = Integer.parseInt(firstTwo);
+                        if (firstTwoNum != 12) {
+                            firstTwoNum = firstTwoNum + 12;
+                            String parsed = String.valueOf(firstTwoNum);
+                            trimmedEnd = parsed + trimmedEnd.substring(2);
+//                        System.out.println("After + 12 " + trimmedEnd);
+                        }
+                    }
+                    Date startTime = new SimpleDateFormat("HH:mm").parse(trimmedStart);
+                    Calendar calendar1 = Calendar.getInstance();
+                    calendar1.setTime(startTime);
+
+
+                    Date endTime = new SimpleDateFormat("HH:mm").parse(trimmedEnd);
+                    Calendar calendar2 = Calendar.getInstance();
+                    calendar2.setTime(endTime);
+
+                String currentTimeStringTest = "16:30";
+//                    String currentTimeStringTest = new SimpleDateFormat("HH:mm").format(new Date());
+
+                    Date checkTime = new SimpleDateFormat("HH:mm").parse(currentTimeStringTest);
+                    Calendar calendar3 = Calendar.getInstance();
+                    calendar3.setTime(checkTime);
+
+
+                    System.out.println("Start Time: " + trimmedStart);
+                    System.out.println("Current Time: " + currentTimeStringTest);
+                    System.out.println("End Time: " + trimmedEnd);
+
+                    if (endTime.compareTo(startTime) < 0) {
+                        calendar2.add(Calendar.DATE, 1);
+                        calendar3.add(Calendar.DATE, 1);
+                    }
+
+                    java.util.Date actualTime = calendar3.getTime();
+                    if ((actualTime.after(calendar1.getTime()) ||
+                            actualTime.compareTo(calendar1.getTime()) == 0) &&
+                            actualTime.before(calendar2.getTime())) {
+                        System.out.println("Class is in Sessiion");
+                        long differenceInMinutes = endTime.getTime() - startTime.getTime();
+                        differenceInMinutes= differenceInMinutes/  (60 * 1000) % 60;
+                        System.out.println("Class Room open in " + differenceInMinutes + " minutes!");
+                        return true;
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        for(int i = 0; i < classStart.size(); i ++){
-            System.out.println("class Start----: " +classStart.get(i).toString());
-
-
-        }
-        for(int i = 0; i < classDay.size(); i ++){
-            System.out.println("class Day****: " +classDay.get(i).toString());
-
-
-        }
-
-
-
-        return true;
+        return false;
     }
 
     public String getPercentage() {
@@ -176,9 +220,17 @@ public class Lab implements Serializable {
         return percentage;
     }
 
-    public int getInUseComputers(){return inUseComputers;}
-    public int getTotalComputers(){return totalComputers;}
-    public int getPresetTotalComputers(){return presetTotalComputers;}
+    public int getInUseComputers() {
+        return inUseComputers;
+    }
+
+    public int getTotalComputers() {
+        return totalComputers;
+    }
+
+    public int getPresetTotalComputers() {
+        return presetTotalComputers;
+    }
 
     public void setRoom(String room) {
         this.room = room;
@@ -191,7 +243,6 @@ public class Lab implements Serializable {
     public void setSchedule(String schedule) {
         this.schedule = schedule;
     }
-
 
 
 }

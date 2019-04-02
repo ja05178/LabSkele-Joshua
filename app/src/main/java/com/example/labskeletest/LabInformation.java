@@ -9,6 +9,7 @@ import android.widget.ExpandableListView;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -61,7 +62,7 @@ public class LabInformation extends AppCompatActivity {
         ArrayList<String> listPrinter = populatePrinter();
         listHashMap.put(listBuildingHeader.get(2),listPrinter);
 
-        listBuildingHeader.add("Lab Hours:");
+        listBuildingHeader.add("Class Hours:");
         ArrayList<String> listOfHours = populateHours();
         listHashMap.put(listBuildingHeader.get(3), listOfHours);
 
@@ -75,14 +76,40 @@ public class LabInformation extends AppCompatActivity {
         return softwareList;
     }
     public ArrayList<String> populateHours( ){
-        ArrayList<String> listOfHours = new ArrayList<String>();
-        listOfHours.add("Monday: x-x");
-        listOfHours.add("Tuesday: x-x");
-        listOfHours.add("Wednesday: x-x");
-        listOfHours.add("Thursday: x-x");
-        listOfHours.add("Friday: x-x");
-        listOfHours.add("Saturday: x-x");
-        listOfHours.add("Sunday: x-x");
+        ArrayList<String> listOfHours = new ArrayList<>();
+        ArrayList<String> listOfStart = lab.getClassStart();
+        ArrayList<String> listOfEnd = lab.getClassEnd();
+        ArrayList<String> listOfDay = lab.getClassDay();
+        Calendar currentTime = Calendar.getInstance();
+        int day = currentTime.get(Calendar.DAY_OF_WEEK);
+        String day_of_week = "";
+        switch (day) {
+            case Calendar.SUNDAY:
+                day_of_week = "S";
+                break;
+            case Calendar.MONDAY:
+                day_of_week = "M";
+            case Calendar.TUESDAY:
+                day_of_week = "T";
+                break;
+            case Calendar.WEDNESDAY:
+                day_of_week = "W";
+                break;
+            case Calendar.THURSDAY:
+                day_of_week = "R";
+                break;
+            case Calendar.FRIDAY:
+                day_of_week = "F";
+                break;
+            case Calendar.SATURDAY:
+                day_of_week = "S";
+                break;
+        }
+        for(int i =0; i < listOfStart.size();i++){
+            if(listOfDay.get(i).contains(day_of_week)){
+                listOfHours.add(listOfStart.get(i) + " - "+ listOfEnd.get(i));
+            }
+        }
         return listOfHours;
     }
     public ArrayList<String> populateLabHeader( ){

@@ -143,7 +143,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         setColor(child, percentLabel);
 
         Calendar currentTime = Calendar.getInstance();
-        child.checkClassInSession(currentTime);
+        boolean classInSession = child.checkClassInSession(currentTime);
+        TextView classInSessionTV = view.findViewById(R.id.tvLabSched);
+        if(classInSession == true){
+            classInSessionTV.setText("Status: IN USE!");
+            classInSessionTV.setTextColor(context.getResources().getColor(R.color.colorRed));
+        }
+        else{
+            classInSessionTV.setText("Status: OPEN!");
+            classInSessionTV.setTextColor(context.getResources().getColor(R.color.colorGreen));
+        }
         return view;
     }
     public void setLabClicked(String lab, Lab object){

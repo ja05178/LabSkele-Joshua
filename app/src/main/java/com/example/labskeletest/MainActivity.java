@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements Favorites.OnFragm
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
 
         Context context = getApplicationContext();
 
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements Favorites.OnFragm
 
             }
         });
+
     }
 
     @Override

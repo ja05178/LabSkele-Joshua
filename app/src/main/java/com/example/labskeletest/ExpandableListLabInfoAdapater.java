@@ -10,11 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -79,34 +81,37 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
         if(view == null){
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.listview_textview, null);
+//            if(groupPosition == 0){
+//                view = setUpLabName(view);
+//            }
+//            else if (groupPosition ==1){
+//                view = setUpOccupancy(view);
+//            }
+//            else if (groupPosition ==2){
+//                view = setUpPrinter(view);
+//            }
+//            else if (groupPosition ==3){
+//                view = setUpLabHours(view);
+//            }
+//            else if (groupPosition ==4){
+            view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
+            if (groupPosition ==4){
+                view = setUpSoftware(view);
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        labSoftwareClicked(v, lab);
+                    }
+                });
+            }
         }
 
         TextView listLabel = (TextView) view.findViewById(R.id.lvHeaders);
 
         listLabel.setTypeface(null , Typeface.BOLD);
         listLabel.setText(headerTitle);
+        System.out.println(groupPosition + "---GROUP POSITION---- " + headerTitle);
 
-        if(groupPosition == 0){
-            view = setUpLabName(view);
-        }
-        else if (groupPosition ==1){
-            view = setUpOccupancy(view);
-        }
-        else if (groupPosition ==2){
-            view = setUpPrinter(view);
-        }
-        else if (groupPosition ==3){
-            view = setUpLabHours(view);
-        }
-        else if (groupPosition ==4){
-            view = setUpSoftware(view);
-            view.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    labSoftwareClicked(v);
-                }
-            });
-        }
         return view;
 
     }
@@ -120,8 +125,8 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
 //        }
 //        final TextView childLabel = (TextView) view.findViewById(R.id.tvLabNumber);
 //        childLabel.setText(childText);
-        System.out.println("group position" + groupPosition);
-        System.out.println("childPosition  position" + childPosition);
+//        System.out.println("group position" + groupPosition);
+//        System.out.println("childPosition  position" + childPosition);
 //        if(view == null) {
             if (groupPosition == 0) {
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -132,8 +137,6 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.listitem_occupancy, null);
                 setUpOccupancyChild(childPosition, groupPosition, view);
-//                final TextView childLabel = (TextView) view.findViewById(R.id.tvLabNumber);
-//                childLabel.setText(childText);
             } else if (groupPosition == 2) {
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.listitem_printer, null);
@@ -144,7 +147,7 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
                 view = inflater.inflate(R.layout.listitem_hours, null);
                 final TextView childLabel = (TextView) view.findViewById(R.id.tvLabHours);
                 childLabel.setText(childText);
-            } else {
+            } else if (groupPosition == 4){
                 LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.listitem_software, null);
                 final TextView childLabel = (TextView) view.findViewById(R.id.tvLabSoftware);
@@ -152,6 +155,7 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
             }
 //        }
         view.setBackgroundColor(context.getResources().getColor(R.color.colorTestGrey));
+
        return view;
     }
 
@@ -174,9 +178,9 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
         favoriteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Favorite has been clicked. Lab room:" + lab.getRoom());
+//                System.out.println("Favorite has been clicked. Lab room:" + lab.getRoom());
 
-                System.out.println("Child.getRoom ----" + lab.getRoom());
+ //               System.out.println("Child.getRoom ----" + lab.getRoom());
                 if(favoriteBtn.isChecked()) {
                     favoriteBtn.setBackgroundResource(R.drawable.btn_favorite);
                     String UUID = MainActivity.uniqueID;
@@ -202,7 +206,16 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
         setColor(lab, percentLabel);
 
         Calendar currentTime = Calendar.getInstance();
-        lab.checkClassInSession(currentTime);
+        boolean classInSession = lab.checkClassInSession(currentTime);
+        TextView classInSessionTV = view.findViewById(R.id.tvLabSched2);
+        if(classInSession == true){
+            classInSessionTV.setText("Status: IN USE!");
+            classInSessionTV.setTextColor(context.getResources().getColor(R.color.colorRed));
+        }
+        else{
+            classInSessionTV.setText("Status: OPEN!");
+            classInSessionTV.setTextColor(context.getResources().getColor(R.color.colorGreen));
+        }
     }
 
     @Override
@@ -269,12 +282,19 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
         view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
         return view;
     }
-    private void labSoftwareClicked(View view){
+    private void labSoftwareClicked(View view, Lab lab){
         System.out.println("Software CLicked");
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+        ArrayList<String> softwareList = lab.getSoftware();
+        for(int i = 0; i < softwareList.size(); i ++){
+            System.out.println(softwareList.get(i));
+        }
+        View softwarePopup = (View) inflater.inflate(R.layout.popup_listview,null);
+        ListView softwareListView = (ListView) softwarePopup.findViewById(R.id.popup_listview_);
+        PopupWindow mPopupWindow = new PopupWindow(softwarePopup, ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        popupListViewAdapter adapter = new popupListViewAdapter(context,softwareList);
 
-        View softwarePopup = inflater.inflate(R.layout.software_popup,null);
-        PopupWindow mPopupWindow = new PopupWindow(softwarePopup, RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        softwareListView.setAdapter(adapter);
         mPopupWindow.showAtLocation(view, Gravity.CENTER,0,0);
     }
 }
