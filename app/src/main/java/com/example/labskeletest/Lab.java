@@ -6,10 +6,12 @@ import java.io.Serializable;
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +26,7 @@ public class Lab implements Serializable {
     private int inUseComputers;
     private int totalComputers;
     private int presetTotalComputers;
+    private boolean printerStatus;
 
 
     Lab(String labRoom) {
@@ -37,25 +40,17 @@ public class Lab implements Serializable {
     }
 
     public void getItemStatus() throws SQLException {
-
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println("Time stamp before: " + timestamp);
         DBAccess dba = new DBAccess();
-        ResultSet occupancy = dba.getOccupancy(room);
 
+        ResultSet occupancy = dba.getLabStatus(room);
         occupancy.next();
         inUseComputers = occupancy.getInt("InUse");
-
-        occupancy = dba.getTotalComputers(room);
-
-        occupancy.next();
         totalComputers = occupancy.getInt("Total");
-
-        occupancy = dba.getPreSetTotalComputers(room);
-
-        occupancy.next();
-        presetTotalComputers = occupancy.getInt("Total");
+        presetTotalComputers = occupancy.getInt("PresetTotal");
 
         occupancy = dba.getSoftware(room);
-
         occupancy.next();
         while (occupancy.next()) {
             String software = occupancy.getString("Name");
@@ -77,7 +72,8 @@ public class Lab implements Serializable {
             classEnd.add(class_end);
             classDay.add(class_day);
         }
-
+        timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println("Time stamp after: " + timestamp);
 
     }
 
@@ -110,7 +106,6 @@ public class Lab implements Serializable {
     }
 
     public boolean checkClassInSession(Calendar currentTime) {
-
         int day = currentTime.get(Calendar.DAY_OF_WEEK);
         String day_of_week = "";
         switch (day) {
@@ -179,8 +174,8 @@ public class Lab implements Serializable {
                     Calendar calendar2 = Calendar.getInstance();
                     calendar2.setTime(endTime);
 
-                String currentTimeStringTest = "16:30";
-//                    String currentTimeStringTest = new SimpleDateFormat("HH:mm").format(new Date());
+
+                    String currentTimeStringTest = new SimpleDateFormat("HH:mm").format(new Date());
 
                     Date checkTime = new SimpleDateFormat("HH:mm").parse(currentTimeStringTest);
                     Calendar calendar3 = Calendar.getInstance();

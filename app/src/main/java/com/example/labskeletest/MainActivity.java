@@ -1,6 +1,7 @@
 package com.example.labskeletest;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
@@ -18,12 +19,6 @@ import java.util.HashMap;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements Favorites.OnFragmentInteractionListener, Map.OnFragmentInteractionListener,List.OnFragmentInteractionListener {
-//Connection object
-//    private ExpandableListView listView;
-//    private ExpandableListAdapter listAdapter;
-//    private ArrayList<String> listBuildingHeader;
-//    private HashMap<String, java.util.List<String>> listHashMap;
-
     static String uniqueID = null;
     private static final String PREF_UNIQUE_ID = "PREF_UNOQUE_ID";
 //    DBConfiguration dbc = new DBConfiguration();
@@ -52,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements Favorites.OnFragm
                 dba.saveUser(uniqueID);
             }
         }
+
 
 
         populateLabList("CEIT");
@@ -84,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements Favorites.OnFragm
 
             }
         });
-
+        viewpager.setCurrentItem(1);
     }
 
     @Override

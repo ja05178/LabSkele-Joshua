@@ -53,11 +53,18 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
         }
         return null;
     }
-
-    public ResultSet getComputers(String lab){
+    public ResultSet getLabStatus(String lab){
         conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
 
-        String query = "Use lablocator; select * from machine_info where host like '%." + lab + "X0%' order by host ASC;";
+        String query =
+                "use lablocator; Select \n" +
+                        "(Select SUM (CASE WHEN occupied = 1 THEN 1 ELSE 0 END) as InUse FROM machine_info where host like '%" + lab + "X0%') as InUse, \n" +
+                        "(select Total from labs where LabID LIKE '%" + lab + "%') as PresetTotal, \n" +
+                        "(select COUNT(*) AS Total from machine_info where host LIKE '%" + lab + "X0%') as Total"
+
+
+                ;
+        System.out.println(query);
         //String query = "select * from INFORMATION_SCHEMA.COLUMNS";
         try{
 
@@ -68,6 +75,7 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
             e.printStackTrace();
         }
         return rs;
+
     }
     public ResultSet getClassTimes(String lab){
         conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
@@ -76,49 +84,6 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
         System.out.println(query);
         try{
 
-            Log.i("Conn status", String.valueOf(conn.isClosed()));
-            Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return rs;
-    }
-
-    public ResultSet getOccupancy(String lab){
-        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
-        String query = "Use lablocator; select COUNT(*) AS InUse from machine_info where host LIKE '%" + lab + "%' AND occupied='1';";
-
-
-        try{
-            Log.i("Conn status", String.valueOf(conn.isClosed()));
-            Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
-
-        }catch(SQLException e){
-
-            e.printStackTrace();
-        }
-        return rs;
-    }
-    public ResultSet getTotalComputers(String lab){
-        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
-        String query = "Use lablocator; select COUNT(*) AS Total from machine_info where host LIKE '%" + lab + "%';";
-
-        try{
-            Log.i("Conn status", String.valueOf(conn.isClosed()));
-            Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return rs;
-    }
-    public ResultSet getPreSetTotalComputers(String lab){
-        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
-        String query = "Use lablocator; select Total from labs where LabID LIKE '%" + lab + "%';";
-
-        try{
             Log.i("Conn status", String.valueOf(conn.isClosed()));
             Statement stmt = conn.createStatement();
             rs = stmt.executeQuery(query);
@@ -206,6 +171,21 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
         String query = "Use lablocator; Select * from available_software where LabID = '" + lab + "'";
 
 
+        try{
+            Log.i("Conn status", String.valueOf(conn.isClosed()));
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    public ResultSet getPrinterStatus(String room) {
+        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
+        String building;
+
+        String query = "Use lablocator; Select * from available_software where LabID = '" + room + "'";
         try{
             Log.i("Conn status", String.valueOf(conn.isClosed()));
             Statement stmt = conn.createStatement();

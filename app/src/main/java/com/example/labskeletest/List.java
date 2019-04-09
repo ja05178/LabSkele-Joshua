@@ -203,19 +203,4 @@ public class List extends Fragment  {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
-
-    public void test() throws SQLException {
-        DBAccess dba = new DBAccess();
-        computersRS = dba.getComputers("1201");
-        ArrayList<Computer> listOfComputers = new ArrayList<Computer>();
-
-        if(computersRS == null){
-            //DO SOMETHING
-        }else{
-            while(computersRS.next()){
-
-
-            }
-        }
-    }
 }

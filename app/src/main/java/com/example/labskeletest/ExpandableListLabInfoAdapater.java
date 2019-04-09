@@ -81,21 +81,10 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
         if(view == null){
             LayoutInflater inflater = (LayoutInflater) this.context.getSystemService(LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.listview_textview, null);
-//            if(groupPosition == 0){
-//                view = setUpLabName(view);
-//            }
-//            else if (groupPosition ==1){
-//                view = setUpOccupancy(view);
-//            }
-//            else if (groupPosition ==2){
-//                view = setUpPrinter(view);
-//            }
-//            else if (groupPosition ==3){
-//                view = setUpLabHours(view);
-//            }
-//            else if (groupPosition ==4){
+            System.out.println("Header Title " + headerTitle + " Group Position" + groupPosition);
             view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernGold));
-            if (groupPosition ==4){
+
+            if (headerTitle.equals("Software Available:")){
                 view = setUpSoftware(view);
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -154,7 +143,7 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
                 childLabel.setText(childText);
             }
 //        }
-        view.setBackgroundColor(context.getResources().getColor(R.color.colorTestGrey));
+        view.setBackgroundColor(context.getResources().getColor(R.color.colorGeorgiaSouthernLightBlue));
 
        return view;
     }
@@ -209,11 +198,11 @@ public class ExpandableListLabInfoAdapater extends BaseExpandableListAdapter {
         boolean classInSession = lab.checkClassInSession(currentTime);
         TextView classInSessionTV = view.findViewById(R.id.tvLabSched2);
         if(classInSession == true){
-            classInSessionTV.setText("Status: IN USE!");
+            classInSessionTV.setText("IN CLASS");    /*"Status: IN USE!"*/
             classInSessionTV.setTextColor(context.getResources().getColor(R.color.colorRed));
         }
         else{
-            classInSessionTV.setText("Status: OPEN!");
+            classInSessionTV.setText("OPEN");      /*"Status: OPEN!"*/
             classInSessionTV.setTextColor(context.getResources().getColor(R.color.colorGreen));
         }
     }

@@ -83,8 +83,8 @@ public class Favorites extends Fragment {
         testList = container.findViewById(R.id.listViewFavorites);
 
         // Inflate the layout for this fragment
-        inflatedView = inflater.inflate(R.layout.fragment_list, container, false);
-        listView = (ExpandableListView) inflatedView.findViewById(R.id.listView);
+        inflatedView = inflater.inflate(R.layout.fragment_favorites, container, false);
+        listView = (ExpandableListView) inflatedView.findViewById(R.id.listViewFavorites);
         initData();
         listAdapter = new ExpandableListAdapter(getActivity(), listBuildingHeader, listHashMap);
         listView.setAdapter(listAdapter);
