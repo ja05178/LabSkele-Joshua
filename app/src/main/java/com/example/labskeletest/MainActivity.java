@@ -3,6 +3,7 @@ package com.example.labskeletest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -14,6 +15,7 @@ import android.widget.ProgressBar;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -25,6 +27,9 @@ public class MainActivity extends AppCompatActivity implements Favorites.OnFragm
     static DBAccess dba = new DBAccess();
     public static ArrayList<Lab> listOfLabs = new ArrayList<Lab>();
     public static  ArrayList<String> listOfFavorites = new ArrayList<String>();
+    public static int queries = 0;
+    public static int labs = 0;
+    public static databaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +53,14 @@ public class MainActivity extends AppCompatActivity implements Favorites.OnFragm
             }
         }
 
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println("Time stamp before: " + timestamp);
 
-
+        databaseHelper = new databaseHelper(this);
         populateLabList("CEIT");
 
+        timestamp = new Timestamp(System.currentTimeMillis());
+        System.out.println("Time stamp after: " + timestamp);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
          tabLayout.addTab(tabLayout.newTab());
@@ -122,8 +131,10 @@ public class MainActivity extends AppCompatActivity implements Favorites.OnFragm
             while (rs.next()) {
                 String lab = rs.getString("LabID");
                 //lab = lab.substring(lab.length() - 4);
-
-                listOfLabs.add(new Lab(lab));
+                if(building.equals("CEIT")){
+                    if(!(lab.equals("CEIT2552208")||lab.equals("CEIT2552210")))
+                        listOfLabs.add(new Lab(lab));
+                }
             }
         }
         catch (SQLException e){

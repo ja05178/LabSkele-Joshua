@@ -1,12 +1,14 @@
 package com.example.labskeletest;
 
 import android.annotation.SuppressLint;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.util.Log;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -53,51 +55,12 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
         }
         return null;
     }
-    public ResultSet getLabStatus(String lab){
-        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
-
-        String query =
-                "use lablocator; Select \n" +
-                        "(Select SUM (CASE WHEN occupied = 1 THEN 1 ELSE 0 END) as InUse FROM machine_info where host like '%" + lab + "X0%') as InUse, \n" +
-                        "(select Total from labs where LabID LIKE '%" + lab + "%') as PresetTotal, \n" +
-                        "(select COUNT(*) AS Total from machine_info where host LIKE '%" + lab + "X0%') as Total"
 
 
-                ;
-        System.out.println(query);
-        //String query = "select * from INFORMATION_SCHEMA.COLUMNS";
-        try{
-
-            Log.i("Conn status", String.valueOf(conn.isClosed()));
-            Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return rs;
-
-    }
-    public ResultSet getClassTimes(String lab){
-        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
-
-        String query = "Use lablocator; select * from classes where location like '%" + lab + "%' order by location ASC;";
-        System.out.println(query);
-        try{
-
-            Log.i("Conn status", String.valueOf(conn.isClosed()));
-            Statement stmt = conn.createStatement();
-            rs = stmt.executeQuery(query);
-        }catch(SQLException e){
-            e.printStackTrace();
-        }
-        return rs;
-    }
 
     public void saveFavorite(String UUID, String lab){
         conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
         String query = "Use lablocator; Insert into favorites (UUID, LabID) values ('" + UUID + "','" + lab + "');";
-
-
         try{
             Log.i("Conn status", String.valueOf(conn.isClosed()));
             Statement stmt = conn.createStatement();
@@ -166,11 +129,13 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
         return rs;
     }
 
-    public ResultSet getSoftware(String lab){
+
+
+    public ResultSet getPrinterStatus(String room) {
         conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
-        String query = "Use lablocator; Select * from available_software where LabID = '" + lab + "'";
+        String building;
 
-
+        String query = "Use lablocator; Select * from available_software where LabID = '" + room + "'";
         try{
             Log.i("Conn status", String.valueOf(conn.isClosed()));
             Statement stmt = conn.createStatement();
@@ -180,14 +145,46 @@ public class DBAccess extends AsyncTask<Void , Void , Void> {
         }
         return rs;
     }
-
-    public ResultSet getPrinterStatus(String room) {
+    public ResultSet getDBMachine_Info(){
         conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
-        String building;
-
-        String query = "Use lablocator; Select * from available_software where LabID = '" + room + "'";
+        String query = "Use lablocator; Select * from machine_info";
         try{
-            Log.i("Conn status", String.valueOf(conn.isClosed()));
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    public ResultSet getDBAvailable_software() {
+        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
+        String query = "Use lablocator; Select * from available_software";
+        try{
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    public ResultSet getDBclasses() {
+        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
+        String query = "Use lablocator; Select * from classes";
+        try{
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery(query);
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        return rs;
+    }
+
+    public ResultSet getDBlabs() {
+        conn = getConnection(dbc.getUserName() , dbc.getPassword() , dbc.getDb() , dbc.getServerName());
+        String query = "Use lablocator; Select * from labs";
+        try{
             Statement stmt = conn.createStatement();
             rs = stmt.executeQuery(query);
         }catch(SQLException e){

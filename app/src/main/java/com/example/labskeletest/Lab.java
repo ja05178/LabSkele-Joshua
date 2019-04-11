@@ -1,5 +1,6 @@
 package com.example.labskeletest;
 
+import android.database.Cursor;
 import android.os.Parcelable;
 
 import java.io.Serializable;
@@ -40,30 +41,26 @@ public class Lab implements Serializable {
     }
 
     public void getItemStatus() throws SQLException {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println("Time stamp before: " + timestamp);
-        DBAccess dba = new DBAccess();
 
-        ResultSet occupancy = dba.getLabStatus(room);
-        occupancy.next();
-        inUseComputers = occupancy.getInt("InUse");
-        totalComputers = occupancy.getInt("Total");
-        presetTotalComputers = occupancy.getInt("PresetTotal");
-
-        occupancy = dba.getSoftware(room);
-        occupancy.next();
-        while (occupancy.next()) {
-            String software = occupancy.getString("Name");
-            softwareList.add(software);
+        Cursor data = MainActivity.databaseHelper.getLabStatus(room);
+        while(data.moveToNext()){
+            String inUse = data.getString(0);
+            String total = data.getString(1);
+            String preset = data.getString(2);
+            inUseComputers = Integer.parseInt(inUse);
+            totalComputers = Integer.parseInt(total);
+            presetTotalComputers = Integer.parseInt(preset);
         }
+        data = MainActivity.databaseHelper.getSoftware(room);
+        while(data.moveToNext()){
+            softwareList.add(data.getString(0));
+        }
+        data = MainActivity.databaseHelper.getClassTimes(room);
+        while(data.moveToNext()){
 
-        occupancy = dba.getClassTimes(room);
-
-        occupancy.next();
-        while (occupancy.next()) {
-            String class_start = occupancy.getString("start_time");
-            String class_end = occupancy.getString("end_time");
-            String class_day = occupancy.getString("days");
+            String class_start = data.getString(0);
+            String class_end = data.getString(1);
+            String class_day = data.getString(3);
 
             class_start = formatTime(class_start);
             class_end = formatTime(class_end);
@@ -72,9 +69,6 @@ public class Lab implements Serializable {
             classEnd.add(class_end);
             classDay.add(class_day);
         }
-        timestamp = new Timestamp(System.currentTimeMillis());
-        System.out.println("Time stamp after: " + timestamp);
-
     }
 
     public String formatTime(String correctFormat) {

@@ -107,9 +107,7 @@ public class List extends Fragment  {
         listHashMap.put(listBuildingHeader.get(0),listOfLabsIT);
 
         listBuildingHeader.add("COBA Building");
-        ArrayList<Lab> listOfLabsCOBA = populateLabList("COBA"/*listBuildingHeader.get(1)*/);
 
-        listHashMap.put(listBuildingHeader.get(1),listOfLabsCOBA);
     }
 
     public ArrayList<Lab> populateLabList(String building){
